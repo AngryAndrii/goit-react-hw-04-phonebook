@@ -1,91 +1,67 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { Section } from './Section/Section';
 import { PhoneBook } from './PhoneBook/PhoneBook';
 import { Contacts } from './Contacts/Contacts';
 import { Filter } from './Filter/Filter';
 import { nanoid } from 'nanoid';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
+export const App = () => {
+  const [contacts, setContacts] = useState(
+    JSON.parse(localStorage.getItem('contacts')) ?? []
+  );
+  const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  const changeFilter = newFilter => {
+    setFilter(newFilter);
   };
 
-  componentDidMount() {
-    const savedContacts = localStorage.getItem('contacts');
-    if (savedContacts !== null) {
-      this.setState({
-        contacts: JSON.parse(savedContacts),
-      });
+  const handleDelete = id => {
+    setContacts(prevState => prevState.filter(el => el.id !== id));
+  };
+
+  const addToMainState = ({ name, number }) => {
+    const isIn = contacts.some(
+      el => el.name.toLowerCase() === name.toLowerCase()
+    );
+    if (isIn) {
+      alert(`${name} is already in contacts.`);
+      return;
     }
-  }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.contacts !== this.state.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
-
-  changeFilter = newFilter => {
-    this.setState({
-      filter: newFilter,
-    });
-  };
-
-  handleDelete = id => {
-    this.setState(prevState => {
-      return {
-        contacts: prevState.contacts.filter(el => el.id !== id),
-      };
-    });
-  };
-
-  addToMainState = ({ name, number }) => {
     const newContact = {
       name,
       number,
       id: nanoid(),
     };
-
-    const isIn = this.state.contacts.some(
-      el => el.name.toLowerCase() === newContact.name.toLowerCase()
-    );
-    if (isIn) {
-      alert(`${newContact.name} is already in contacts.`);
-      return;
-    }
-    this.setState({
-      contacts: [
-        ...this.state.contacts,
-        { name: newContact.name, id: newContact.id, number: newContact.number },
-      ],
-    });
+    console.log(contacts);
+    setContacts(prevContacts => [
+      ...prevContacts,
+      // { name: newContact.name, id: newContact.id, number: newContact.number },
+      newContact,
+    ]);
   };
 
-  render() {
-    const { contacts, filter } = this.state;
-    const visibleContacts = contacts.filter(el =>
-      el.name.toLowerCase().includes(filter.toLowerCase())
-    );
+  const visibleContacts = contacts.filter(el =>
+    el.name.toLowerCase().includes(filter.toLowerCase())
+  );
 
-    return (
-      <>
-        <Section title="Phonebook">
-          <h2>{this.title}</h2>
-          <PhoneBook
-            appState={this.state}
-            addToAppState={this.addToMainState}
-          />
-        </Section>
-        <Section title="Contacts">
-          <h2>{this.title}</h2>
-          <Filter value={filter} handleFilterChange={this.changeFilter} />
-          <Contacts
-            items={visibleContacts}
-            deleteFunction={this.handleDelete}
-          />
-        </Section>
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <Section title="Phonebook">
+        <PhoneBook
+          // contacts={contacts}
+          // filter={filter}
+          addToAppState={addToMainState}
+        />
+      </Section>
+      <Section title="Contacts">
+        <Filter value={filter} handleFilterChange={changeFilter} />
+        <Contacts items={visibleContacts} deleteFunction={handleDelete} />
+      </Section>
+    </>
+  );
+};
