@@ -38,11 +38,7 @@ export const App = () => {
       id: nanoid(),
     };
     console.log(contacts);
-    setContacts(prevContacts => [
-      ...prevContacts,
-      // { name: newContact.name, id: newContact.id, number: newContact.number },
-      newContact,
-    ]);
+    setContacts(prevContacts => [...prevContacts, newContact]);
   };
 
   const visibleContacts = contacts.filter(el =>
@@ -52,11 +48,7 @@ export const App = () => {
   return (
     <>
       <Section title="Phonebook">
-        <PhoneBook
-          // contacts={contacts}
-          // filter={filter}
-          addToAppState={addToMainState}
-        />
+        <PhoneBook addToAppState={addToMainState} />
       </Section>
       <Section title="Contacts">
         <Filter value={filter} handleFilterChange={changeFilter} />
