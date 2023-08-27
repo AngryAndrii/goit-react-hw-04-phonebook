@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export const PhoneBook = addToAppState => {
+export const PhoneBook = ({ addToAppState }) => {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
@@ -14,10 +14,9 @@ export const PhoneBook = addToAppState => {
 
   const handleSubmit = event => {
     event.preventDefault();
-    addToAppState(name, number);
+    addToAppState({ name, number });
     setName('');
     setNumber('');
-    console.log(event);
   };
 
   return (
@@ -33,7 +32,7 @@ export const PhoneBook = addToAppState => {
             title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
             required
             onChange={handleInputChangeName}
-            // value={name}
+            value={name}
           />
         </label>
         <label htmlFor="">
@@ -46,7 +45,7 @@ export const PhoneBook = addToAppState => {
             title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
             required
             onChange={handleInputChangeNumber}
-            // value={number}
+            value={number}
           />
         </label>
         <button type="submit">Submit</button>
